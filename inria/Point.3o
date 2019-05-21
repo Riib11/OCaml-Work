@@ -1,0 +1,25 @@
+.TH "Point" 3 2019-05-19 OCamldoc ""
+.SH NAME
+Point \- all Point elements
+
+
+.SH Type Inlinerecord.t
+.I Point {
+ width : 
+.B int
+;
+
+.B mutable 
+x : 
+.B float
+;
+
+.B mutable 
+y : 
+.B float
+;
+ }
+
+.sp
+
+.sp

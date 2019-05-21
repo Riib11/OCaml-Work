@@ -1,0 +1,16 @@
+.TH "print_point" 3 2019-05-19 OCamldoc ""
+.SH NAME
+print_point \- all print_point elements
+
+
+.SH Module Inlinerecord
+
+.I val print_point 
+: 
+.B t -> unit
+.sp
+Now for some definitions of 
+.B print_point
+
+
+.sp

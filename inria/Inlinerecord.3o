@@ -1,0 +1,57 @@
+.TH "Inlinerecord" 3 2019-05-19 OCamldoc ""
+.SH NAME
+Inlinerecord \- no description
+.SH Module
+Module   Inlinerecord
+.SH Documentation
+.sp
+Module
+.BI "Inlinerecord"
+ : 
+.B sig  end
+
+.sp
+
+.sp
+
+.sp
+.sp
+.I type t 
+=
+ | Point
+.B of {
+ width : 
+.B int
+;
+
+.B mutable 
+x : 
+.B float
+;
+
+.B mutable 
+y : 
+.B float
+;
+ }
+ 
+.sp
+
+.sp
+
+.I val v 
+: 
+.B t
+.sp
+
+.sp
+
+.I val print_point 
+: 
+.B t -> unit
+.sp
+Now for some definitions of 
+.B print_point
+
+
+.sp

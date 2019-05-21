@@ -1,0 +1,28 @@
+.TH "t" 3 2019-05-19 OCamldoc ""
+.SH NAME
+t \- all t elements
+
+
+.SH Module Inlinerecord
+.I type t 
+=
+ | Point
+.B of {
+ width : 
+.B int
+;
+
+.B mutable 
+x : 
+.B float
+;
+
+.B mutable 
+y : 
+.B float
+;
+ }
+ 
+.sp
+
+.sp
