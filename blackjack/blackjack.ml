@@ -1,5 +1,7 @@
 open Random;;
 
+(****************************************************************************************************************************)
+
 module Blackjack = struct
 
   (* score *)
@@ -44,7 +46,13 @@ module Blackjack = struct
     let print c = print_string (to_string c)
   end
 
-  let cards_to_string cs = Array.fold_left (fun s c -> s ^ (Card.to_string c) ^ ", ") "" cs
+  let rec join_strings ss sep =
+    match ss with
+    | []         -> ""
+    | s::[]      -> s
+    | s::s'::ss' -> s ^ sep ^ s' ^ join_strings ss' sep
+
+  let cards_to_string cs = join_strings (Array.to_list (Array.map Card.to_string cs)) ", "
 
   let index_to_card (i:int) =
     let rank  = i mod 13 in
@@ -78,13 +86,12 @@ module Blackjack = struct
   }
 
   let print_bjstate state ~hide_dealer:(h:bool) =
-    Printf.printf "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––\n";
+    print_endline "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––";
     Printf.printf "| player | %d | %s \n" (Score.to_value state.player_score) (cards_to_string state.player_hand);
     if h then
       Printf.printf "| dealer | ## | #### \n"
     else
-      Printf.printf "| dealer | %d | %s \n" (Score.to_value state.dealer_score) (cards_to_string state.dealer_hand);
-    Printf.printf "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––\n"
+      Printf.printf "| dealer | %d | %s \n" (Score.to_value state.dealer_score) (cards_to_string state.dealer_hand)
 
   let draw_from state : Card.card =
     let c = state.deck.(0) in
@@ -118,7 +125,7 @@ module Blackjack = struct
   type move = Stay | Hit
 
   let rec get_player_move () : move =
-    Printf.printf "> "; flush stdout;
+    Printf.printf "–> "; flush stdout;
     let input = read_line () in
     if      String.contains input 's' then Stay
     else if String.contains input 'h' then Hit
@@ -141,7 +148,9 @@ module Blackjack = struct
           play_player state
 
   let rec play_dealer state : unit =
-    if (Score.to_value state.dealer_score) >= 17 then (* stay *)
+    let player_value = Score.to_value state.player_score in
+    let dealer_value = Score.to_value state.dealer_score in
+    if (dealer_value>=17) && (player_value<=21) then (* stay *)
       print_bjstate state ~hide_dealer:false
     else (* hit *)
       print_bjstate state ~hide_dealer:false;
@@ -153,14 +162,36 @@ module Blackjack = struct
       end
 
   let check_winner state =
+    print_endline "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––";
     if (Score.to_value state.player_score) > 21 then (* player busted *)
-      print_endline "player busted and loses :("
-    else if (Score.to_value state.dealer_score) > 21 then
-      print_endline "dealer busted and player wins!"
+      print_endline "[*] player busted and loses :("
+    else if (Score.to_value state.dealer_score) > 21 then (* dealer busted *)
+      print_endline "[*] dealer busted and player wins!"
     else if (Score.to_value state.player_score) > (Score.to_value state.dealer_score) then
-      print_endline "player wins!"
+      print_endline "[*] player wins!"
     else
-      print_endline "player loses :("
+      print_endline "[*] player loses :("
+
+  let rec get_play_again () : bool =
+    print_string "[?] play again? "; flush stdout;
+    let input = read_line () in
+    if      String.contains input 'y' then true
+    else if String.contains input 'n' then begin
+      print_endline "[*] thank you for playing Blackjack, come again soon.";
+      false
+    end else begin (* unrecognized response *)
+      print_endline "[!] unrecognized response. responses are: (y)es or (n)o";
+      get_play_again ()
+    end
+
+  let reset state =
+    state.deck         <- deck_init;
+    state.player_hand  <- [||];
+    state.player_score <- { min=0 ; max=0 };
+    state.dealer_hand  <- [||];
+    state.dealer_score <- { min=0 ; max = 0 };
+    state.winner       <- None;
+    ()
 
   let rec play state =
     print_endline "============================================";
@@ -174,7 +205,12 @@ module Blackjack = struct
       play_dealer state;
       print_bjstate state ~hide_dealer:false
     end;
-    check_winner state
+    check_winner state;
+    if get_play_again () then begin
+      reset state;
+      play state
+    end else ()
+
 end;;
 
 open Blackjack
